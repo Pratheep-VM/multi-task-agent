@@ -1,0 +1,20 @@
+# 1. Secrets & Credentials 
+.env
+
+# 2. Python Environment & Cache
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 3. Private Data & Databases
+data/memory.db
+data/chroma_db/
+*.db
+*.sqlite3
+
+# 4. OS Generated Files
+.DS_Store
+Thumbs.db

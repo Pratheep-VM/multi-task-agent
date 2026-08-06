@@ -1,0 +1,7 @@
+Pradeep's AI Project Specifications (Confidential):
+- Project Codename: Project Pradeep'sAI
+- Lead Architect: Pradeep
+- Primary Database Engine: SQLite with ChromaDB for Vector Storage
+- Deployment Server: Private Cloud Server in Tokyo Region
+- Target Launch Date: October 15, 2027
+- Security Key Policy: All keys must be rotated every 30 days.
