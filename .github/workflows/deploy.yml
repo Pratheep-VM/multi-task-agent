@@ -23,10 +23,11 @@ jobs:
           # 1. Navigate to your existing cloned directory
           cd ~/Pradeep/pradeep-personal-ai/multi-task-agent
 
-          # 2. Pull the latest changes from GitHub
-          git pull origin main
+          # 2. FORCE SYNC with GitHub (prevents merge conflicts & crashes)
+          git fetch origin main
+          git reset --hard origin/main
 
-          # 3. Create virtual environment if it doesn't exist yet
+          # 3. Create virtual environment if missing
           if [ ! -d "venv" ]; then
             python3 -m venv venv
           fi
@@ -56,6 +57,6 @@ jobs:
             sudo systemctl enable myagent
           fi
 
-          # 6. Start / Restart the service live on port 8011
+          # 6. Restart the service live on port 8011
           sudo systemctl restart myagent
-          echo "Deployment complete! Application is now live on http://13.235.48.164:8011/"
+          echo "Deployment successful!"
