@@ -18,3 +18,4 @@ data/chroma_db/
 # 4. OS Generated Files
 .DS_Store
 Thumbs.db
+data

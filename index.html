@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Task AI Agent Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-80 bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0">
+        <div>
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-robot text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-100 text-lg leading-tight">Pradeep's AI</h1>
+                    <span class="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Engine Online
+                    </span>
+                </div>
+            </div>
+
+            <!-- Specialist Agents List -->
+            <div class="space-y-3">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Specialists</p>
+                
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-3">
+                    <i class="fa-solid fa-user-gear text-purple-400 text-sm"></i>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Supervisor Agent</p>
+                        <p class="text-xs text-slate-400">Workflow & Routing</p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-3">
+                    <i class="fa-solid fa-magnifying-glass text-blue-400 text-sm"></i>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Research Agent</p>
+                        <p class="text-xs text-slate-400">Search & Synthesize</p>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-3">
+                    <i class="fa-solid fa-code text-emerald-400 text-sm"></i>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">Coder Agent</p>
+                        <p class="text-xs text-slate-400">Software Engineering</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="pt-4 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center">
+            <span>Powered by LangChain & Groq</span>
+            <a href="/docs" target="_blank" class="text-brand-400 hover:underline">API Docs <i class="fa-solid fa-external-link text-[10px]"></i></a>
+        </div>
+    </aside>
+
+    <!-- Main Chat Window -->
+    <main class="flex-1 flex flex-col h-full bg-slate-950 relative">
+        
+        <!-- Top Bar -->
+        <header class="h-16 border-b border-slate-800 px-6 flex items-center justify-between bg-slate-900/30 backdrop-blur-sm">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-comments text-brand-400"></i>
+                <h2 class="font-semibold text-slate-200">Multi-Agent Workspace</h2>
+            </div>
+            <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 rounded-md border border-slate-800 hover:bg-slate-800 transition">
+                Clear Chat
+            </button>
+        </header>
+
+        <!-- Messages Box -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Welcome Message -->
+            <div class="flex gap-4 max-w-3xl">
+                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shrink-0">
+                    <i class="fa-solid fa-robot text-xs"></i>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-sm text-slate-200 shadow-sm leading-relaxed">
+                    Hello! I am your <strong>Multi-Agent Assistant</strong>. Ask me a complex question, and my <strong>Supervisor, Researcher, and Coder specialists</strong> will collaborate to answer it for you!
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="hidden px-6 py-2">
+            <div class="flex items-center gap-2 text-xs text-brand-400">
+                <i class="fa-solid fa-spinner animate-spin"></i>
+                <span>Agents are processing your request...</span>
+            </div>
+        </div>
+
+        <!-- Input Box Area -->
+        <div class="p-4 border-t border-slate-800 bg-slate-900/50">
+            <form id="chat-form" onsubmit="sendMessage(event)" class="max-w-4xl mx-auto flex gap-3">
+                <input 
+                    type="text" 
+                    id="user-input" 
+                    placeholder="Ask the agents anything... (e.g., Write a Python web scraper)" 
+                    class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 placeholder-slate-500 transition"
+                    required
+                >
+                <button 
+                    type="submit" 
+                    id="send-btn"
+                    class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-5 py-3 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-brand-600/20 active:scale-95"
+                >
+                    <span>Send</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const sendBtn = document.getElementById('send-btn');
+
+        async function sendMessage(event) {
+            event.preventDefault();
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // 1. Render User Message
+            appendMessage('user', message);
+            userInput.value = '';
+            
+            // 2. Show Typing Indicator
+            typingIndicator.classList.remove('hidden');
+            sendBtn.disabled = true;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                // 3. Call Backend FastAPI Endpoint
+                const response = await fetch('/api/v1/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: message, 
+                        thread_id: 'web_session' 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    appendMessage('agent', data.agent_response);
+                } else {
+                    appendMessage('agent', `❌ Error: ${data.detail || 'Failed to get agent response'}`);
+                }
+            } catch (error) {
+                appendMessage('agent', `❌ Network Error: Could not connect to the agent backend.`);
+            } finally {
+                typingIndicator.classList.add('hidden');
+                sendBtn.disabled = false;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const isUser = sender === 'user';
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex gap-4 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : ''}`;
+
+            const avatar = isUser ? `
+                <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0">
+                    <i class="fa-solid fa-user text-xs"></i>
+                </div>
+            ` : `
+                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shrink-0">
+                    <i class="fa-solid fa-robot text-xs"></i>
+                </div>
+            `;
+
+            const messageContent = `
+                <div class="${isUser ? 'bg-brand-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'} rounded-2xl p-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap">
+                    ${text}
+                </div>
+            `;
+
+            msgDiv.innerHTML = avatar + messageContent;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function clearChat() {
+            chatMessages.innerHTML = '';
+        }
+    </script>
+</body>
+</html>

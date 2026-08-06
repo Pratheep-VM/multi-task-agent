@@ -1,0 +1,61 @@
+name: Deploy and Launch App on Port 8011
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup, Deploy & Launch on Port 8011 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # 1. Navigate to your existing cloned directory
+          cd ~/Pradeep/pradeep-personal-ai/multi-task-agent
+
+          # 2. Pull the latest changes from GitHub
+          git pull origin main
+
+          # 3. Create virtual environment if it doesn't exist yet
+          if [ ! -d "venv" ]; then
+            python3 -m venv venv
+          fi
+
+          # 4. Activate venv & install dependencies
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+          # 5. Automatically create Systemd service for Port 8011 if missing
+          if [ ! -f "/etc/systemd/system/myagent.service" ]; then
+            echo "Creating background service for port 8011..."
+            sudo bash -c 'cat <<EOF > /etc/systemd/system/myagent.service
+          [Unit]
+          Description=Pradeep Multi Agent Workspace
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          WorkingDirectory=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent
+          ExecStart=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8011
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF'
+            sudo systemctl daemon-reload
+            sudo systemctl enable myagent
+          fi
+
+          # 6. Start / Restart the service live on port 8011
+          sudo systemctl restart myagent
+          echo "Deployment complete! Application is now live on http://13.235.48.164:8011/"
