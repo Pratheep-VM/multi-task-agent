@@ -20,10 +20,10 @@ jobs:
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # 1. Navigate to your existing cloned directory
+          # 1. Navigate to your project folder
           cd ~/Pradeep/pradeep-personal-ai/multi-task-agent
 
-          # 2. FORCE SYNC with GitHub (prevents merge conflicts & crashes)
+          # 2. Sync cleanly with GitHub
           git fetch origin main
           git reset --hard origin/main
 
@@ -36,10 +36,8 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
-          # 5. Automatically create Systemd service for Port 8011 if missing
-          if [ ! -f "/etc/systemd/system/myagent.service" ]; then
-            echo "Creating background service for port 8011..."
-            sudo bash -c 'cat <<EOF > /etc/systemd/system/myagent.service
+          # 5. Create Systemd service pointing to main:app
+          sudo tee /etc/systemd/system/myagent.service > /dev/null <<'EOF'
           [Unit]
           Description=Pradeep Multi Agent Workspace
           After=network.target
@@ -47,16 +45,15 @@ jobs:
           [Service]
           User=ubuntu
           WorkingDirectory=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent
-          ExecStart=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8011
+          ExecStart=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8011
           Restart=always
 
           [Install]
           WantedBy=multi-user.target
-          EOF'
-            sudo systemctl daemon-reload
-            sudo systemctl enable myagent
-          fi
+          EOF
 
-          # 6. Restart the service live on port 8011
+          # 6. Reload systemd & restart the app
+          sudo systemctl daemon-reload
+          sudo systemctl enable myagent
           sudo systemctl restart myagent
           echo "Deployment successful!"
