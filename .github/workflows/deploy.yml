@@ -1,4 +1,4 @@
-name: Deploy and Launch App on Port 8011
+name: Deploy and Launch App on Port 8010
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Setup, Deploy & Launch on Port 8011 via SSH
+    - name: Setup, Deploy & Launch on Port 8010 via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -45,7 +45,7 @@ jobs:
           [Service]
           User=ubuntu
           WorkingDirectory=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent
-          ExecStart=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8011
+          ExecStart=/home/ubuntu/Pradeep/pradeep-personal-ai/multi-task-agent/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8010
           Restart=always
 
           [Install]

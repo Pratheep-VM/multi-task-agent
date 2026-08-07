@@ -13,7 +13,7 @@ except Exception:
         secret=os.getenv("MUDRAID_SECRET", "test_secret")
     )
 
-BASE_URL = "http://13.235.48.164:8010/api/v1/tasks"  
+BASE_URL = "http://13.235.48.164:8011/api/v1/tasks"  
 
 # -------------------------------------------------------------------
 # RAG TOOL
