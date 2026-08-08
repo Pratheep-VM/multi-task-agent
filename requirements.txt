@@ -10,3 +10,6 @@ langchain-chroma
 langchain-huggingface 
 sentence-transformers 
 langchain-community
+mudraid-sdk
+
+
