@@ -89,7 +89,13 @@ def supervisor_node(state: MultiAgentState) -> dict:
 def research_node(state: MultiAgentState) -> dict:
     llm = get_llm()
     llm_with_tools = llm.bind_tools(RESEARCH_TOOLS)
-    prompt = SystemMessage(content="You are the Research Specialist Agent. Use 'search_knowledge_base' for project files.")
+    
+    # ✅ Explicitly tell the model which tool to use for private files vs general queries
+    prompt = SystemMessage(content=(
+        "You are the Research Specialist Agent. "
+        "Use 'search_knowledge_base' to search confidential project files, codenames, and launch dates. "
+        "Use 'brave_search' only for general web searches."
+    ))
     
     messages = [prompt] + list(state["messages"])[-10:]
     response = llm_with_tools.invoke(messages)
@@ -99,7 +105,7 @@ def research_node(state: MultiAgentState) -> dict:
             tool_node = ToolNode(RESEARCH_TOOLS)
             tool_result = tool_node.invoke({"messages": [response]})
             return {"messages": [response] + tool_result["messages"]}
-        except Exception:
+        except Exception as e:
             return {"messages": [response]}
             
     return {"messages": [response]}

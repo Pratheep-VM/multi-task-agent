@@ -106,7 +106,7 @@ def brave_search(query: str) -> str:
 # -------------------------------------------------------------------
 # EXPORT TOOLSETS FOR WORKERS
 # -------------------------------------------------------------------
-RESEARCH_TOOLS = [search_knowledge_base]
+RESEARCH_TOOLS = [search_knowledge_base, brave_search]
 CODER_TOOLS = [calculate_math]
 WEBSITE_TOOLS = [list_tasks, create_task, modify_task, remove_task]
 
