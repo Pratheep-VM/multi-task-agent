@@ -64,7 +64,8 @@ def supervisor_node(state: MultiAgentState) -> dict:
             "Respond with ONLY ONE WORD."
         )
         
-        messages = [SystemMessage(content=supervisor_prompt)] + list(state["messages"])
+        recent_messages = list(state["messages"])[-10:]
+        messages = [SystemMessage(content=supervisor_prompt)] + recent_messages
         response = llm.invoke(messages)
         route_output = str(response.content).strip().replace("'", "").replace('"', "")
         
@@ -73,13 +74,13 @@ def supervisor_node(state: MultiAgentState) -> dict:
                 return {"next_step": valid_route}
                 
         # CONVERSATIONAL CHAT FALLBACK
-        conversational_response = llm.invoke(state["messages"])
+        conversational_response = llm.invoke(recent_messages)
         return {"next_step": "FINISH", "messages": [conversational_response]}
 
     except Exception:
         # LAYER 3: GLOBAL SAFETY NET (Guarantees application never crashes)
         llm = get_llm()
-        fallback_response = llm.invoke(state["messages"])
+        fallback_response = llm.invoke(list(state["messages"])[-10:])
         return {"next_step": "FINISH", "messages": [fallback_response]}
 
 # -------------------------------------------------------------------
@@ -90,7 +91,7 @@ def research_node(state: MultiAgentState) -> dict:
     llm_with_tools = llm.bind_tools(RESEARCH_TOOLS)
     prompt = SystemMessage(content="You are the Research Specialist Agent. Use 'search_knowledge_base' for project files.")
     
-    messages = [prompt] + list(state["messages"])
+    messages = [prompt] + list(state["messages"])[-10:]
     response = llm_with_tools.invoke(messages)
     
     if response.tool_calls:
@@ -111,7 +112,7 @@ def coder_node(state: MultiAgentState) -> dict:
     llm_with_tools = llm.bind_tools(CODER_TOOLS)
     prompt = SystemMessage(content="You are the Math Specialist. Use 'calculate_math' for calculations.")
     
-    messages = [prompt] + list(state["messages"])
+    messages = [prompt] + list(state["messages"])[-10:]
     response = llm_with_tools.invoke(messages)
     
     if response.tool_calls:
@@ -132,7 +133,7 @@ def website_api_node(state: MultiAgentState) -> dict:
     llm_with_tools = llm.bind_tools(WEBSITE_TOOLS)
     prompt = SystemMessage(content="You are the Web API Specialist. Use task tools ('create_task', 'list_tasks') to manage tasks.")
     
-    messages = [prompt] + list(state["messages"])
+    messages = [prompt] + list(state["messages"])[-10:]
     response = llm_with_tools.invoke(messages)
     
     if response.tool_calls:
