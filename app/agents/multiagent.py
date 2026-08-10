@@ -90,12 +90,7 @@ def research_node(state: MultiAgentState) -> dict:
     llm = get_llm()
     llm_with_tools = llm.bind_tools(RESEARCH_TOOLS)
     
-    # ✅ Explicitly tell the model which tool to use for private files vs general queries
-    prompt = SystemMessage(content=(
-        "You are the Research Specialist Agent. "
-        "Use 'search_knowledge_base' to search confidential project files, codenames, and launch dates. "
-        "Use 'brave_search' only for general web searches."
-    ))
+    prompt = SystemMessage(content="You are the Research Specialist Agent. Use 'search_knowledge_base' for project files, codenames, launch dates and confidential documents.")
     
     messages = [prompt] + list(state["messages"])[-10:]
     response = llm_with_tools.invoke(messages)

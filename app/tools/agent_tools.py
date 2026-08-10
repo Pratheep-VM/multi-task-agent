@@ -98,15 +98,10 @@ def remove_task(task_id: str) -> str:
     except Exception as e:
         return f"Error removing task: {str(e)}"
 
-@tool
-def brave_search(query: str) -> str:
-    """Searches the internet for current events or general knowledge."""
-    return f"Simulated search results for: {query}. (Note: Real web search API not yet connected)."
-
 # -------------------------------------------------------------------
 # EXPORT TOOLSETS FOR WORKERS
 # -------------------------------------------------------------------
-RESEARCH_TOOLS = [search_knowledge_base, brave_search]
+RESEARCH_TOOLS = [search_knowledge_base]
 CODER_TOOLS = [calculate_math]
 WEBSITE_TOOLS = [list_tasks, create_task, modify_task, remove_task]
 
