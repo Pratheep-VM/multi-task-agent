@@ -3,7 +3,7 @@ import sqlite3
 from typing import Annotated, Sequence
 from typing_extensions import TypedDict
 
-from langchain_core.messages import BaseMessage, SystemMessage
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, AIMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -22,14 +22,21 @@ class MultiAgentState(TypedDict):
 # -------------------------------------------------------------------
 def supervisor_node(state: MultiAgentState) -> dict:
     try:
-        # Extract the latest user prompt text safely
+        messages = list(state["messages"])
+        last_message = messages[-1] if messages else None
+
+        # 1. If an agent already provided a final text answer, FINISH
+        if isinstance(last_message, AIMessage) and not last_message.tool_calls:
+            return {"next_step": "FINISH"}
+
+        # 2. Extract ONLY the last HumanMessage for routing
         last_user_input = ""
-        for msg in reversed(state["messages"]):
-            if hasattr(msg, "content") and msg.content:
+        for msg in reversed(messages):
+            if isinstance(msg, HumanMessage) and msg.content:
                 last_user_input = str(msg.content).lower()
                 break
 
-        # LAYER 1: KEYWORD ROUTER 
+        # LAYER 1: KEYWORD ROUTER
         task_keywords = [
             "task", "tasks", "todo", "api", "http", "endpoint", 
             "list", "create", "add", "delete", "remove", "modify", 
@@ -53,7 +60,7 @@ def supervisor_node(state: MultiAgentState) -> dict:
         if any(keyword in last_user_input for keyword in math_keywords):
             return {"next_step": "CoderAgent"}
 
-        # LAYER 2: PURE TEXT LLM CLASSIFIER (No Function-Calling Schemas!)
+        # LAYER 2: PURE TEXT LLM CLASSIFIER
         llm = get_llm(temperature=0.0)
         supervisor_prompt = (
             "You are a routing supervisor. Choose EXACTLY ONE destination:\n"
@@ -64,9 +71,9 @@ def supervisor_node(state: MultiAgentState) -> dict:
             "Respond with ONLY ONE WORD."
         )
         
-        recent_messages = list(state["messages"])[-10:]
-        messages = [SystemMessage(content=supervisor_prompt)] + recent_messages
-        response = llm.invoke(messages)
+        recent_messages = messages[-10:]
+        prompt_messages = [SystemMessage(content=supervisor_prompt)] + recent_messages
+        response = llm.invoke(prompt_messages)
         route_output = str(response.content).strip().replace("'", "").replace('"', "")
         
         for valid_route in ["WebsiteApiAgent", "ResearchAgent", "CoderAgent"]:
@@ -78,7 +85,6 @@ def supervisor_node(state: MultiAgentState) -> dict:
         return {"next_step": "FINISH", "messages": [conversational_response]}
 
     except Exception:
-        # LAYER 3: GLOBAL SAFETY NET (Guarantees application never crashes)
         llm = get_llm()
         fallback_response = llm.invoke(list(state["messages"])[-10:])
         return {"next_step": "FINISH", "messages": [fallback_response]}
@@ -99,8 +105,10 @@ def research_node(state: MultiAgentState) -> dict:
         try:
             tool_node = ToolNode(RESEARCH_TOOLS)
             tool_result = tool_node.invoke({"messages": [response]})
-            return {"messages": [response] + tool_result["messages"]}
-        except Exception as e:
+            # Pass tool output back to LLM to generate final response
+            final_response = llm.invoke(messages + [response] + tool_result["messages"])
+            return {"messages": [response] + tool_result["messages"] + [final_response]}
+        except Exception:
             return {"messages": [response]}
             
     return {"messages": [response]}
@@ -120,7 +128,8 @@ def coder_node(state: MultiAgentState) -> dict:
         try:
             tool_node = ToolNode(CODER_TOOLS)
             tool_result = tool_node.invoke({"messages": [response]})
-            return {"messages": [response] + tool_result["messages"]}
+            final_response = llm.invoke(messages + [response] + tool_result["messages"])
+            return {"messages": [response] + tool_result["messages"] + [final_response]}
         except Exception:
             return {"messages": [response]}
             
@@ -141,7 +150,8 @@ def website_api_node(state: MultiAgentState) -> dict:
         try:
             tool_node = ToolNode(WEBSITE_TOOLS)
             tool_result = tool_node.invoke({"messages": [response]})
-            return {"messages": [response] + tool_result["messages"]}
+            final_response = llm.invoke(messages + [response] + tool_result["messages"])
+            return {"messages": [response] + tool_result["messages"] + [final_response]}
         except Exception:
             return {"messages": [response]}
             
