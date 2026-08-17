@@ -102,6 +102,19 @@ def remove_task(task_id: str) -> str:
     except Exception as e:
         return f"Error removing task: {str(e)}"
 
+@tool
+def list_tasks() -> str:
+    """Lists all tasks from the Task Management System."""
+    try:
+        response = client.get(BASE_URL)
+        
+        # PRINT THE HEADERS SENT BY client = Agent():
+        print("[DEBUG] Request Headers sent by Agent SDK:", response.request.headers)
+        
+        return f"Tasks:\n{html.escape(response.text)}"
+    except Exception as e:
+        return f"Error fetching tasks: {str(e)}"
+
 # -------------------------------------------------------------------
 # EXPORT TOOLSETS FOR WORKERS
 # -------------------------------------------------------------------
