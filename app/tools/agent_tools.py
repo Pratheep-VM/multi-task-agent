@@ -102,15 +102,28 @@ def remove_task(task_id: str) -> str:
     except Exception as e:
         return f"Error removing task: {str(e)}"
 
+import json
+import base64
+
 @tool
 def list_tasks() -> str:
     """Lists all tasks from the Task Management System."""
     try:
         response = client.get(BASE_URL)
         
-        # PRINT THE HEADERS SENT BY client = Agent():
-        print("[DEBUG] Request Headers sent by Agent SDK:", response.request.headers)
+        # 1. Print HTTP Status and Response Body
+        print(f"[DEBUG list_tasks] Status: {response.status_code}")
+        print(f"[DEBUG list_tasks] Body: {response.text}")
         
+        # 2. Decode and print the scopes inside the token sent by Agent SDK
+        auth_header = response.request.headers.get("Authorization", "")
+        if "Bearer " in auth_header:
+            token = auth_header.split("Bearer ")[1]
+            payload_b64 = token.split(".")[1] + "=="
+            decoded_claims = json.loads(base64.b64decode(payload_b64).decode("utf-8"))
+            print(f"[DEBUG list_tasks] Scopes in Token: {decoded_claims.get('scopes')}")
+            
+        response.raise_for_status()
         return f"Tasks:\n{html.escape(response.text)}"
     except Exception as e:
         return f"Error fetching tasks: {str(e)}"
