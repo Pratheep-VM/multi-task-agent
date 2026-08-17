@@ -104,6 +104,8 @@ def remove_task(task_id: str) -> str:
 
 import json
 import base64
+import html
+from langchain_core.tools import tool
 
 @tool
 def list_tasks() -> str:
@@ -111,19 +113,20 @@ def list_tasks() -> str:
     try:
         response = client.get(BASE_URL)
         
-        # 1. Print HTTP Status and Response Body
-        print(f"[DEBUG list_tasks] Status: {response.status_code}")
-        print(f"[DEBUG list_tasks] Body: {response.text}")
-        
-        # 2. Decode and print the scopes inside the token sent by Agent SDK
+        # --- DEBUG JWT CLAIMS ---
         auth_header = response.request.headers.get("Authorization", "")
         if "Bearer " in auth_header:
-            token = auth_header.split("Bearer ")[1]
-            payload_b64 = token.split(".")[1] + "=="
-            decoded_claims = json.loads(base64.b64decode(payload_b64).decode("utf-8"))
-            print(f"[DEBUG list_tasks] Scopes in Token: {decoded_claims.get('scopes')}")
+            token = auth_header.split("Bearer ")[1].strip()
+            # Decode the unencrypted payload (middle part of JWT)
+            payload_part = token.split(".")[1]
+            padded_b64 = payload_part + "=" * (-len(payload_part) % 4)
+            claims = json.loads(base64.b64decode(padded_b64).decode("utf-8"))
             
-        response.raise_for_status()
+            print("\n================ MUDRAID JWT DEBUG ================")
+            print(f"Audience (Platform): {claims.get('aud')}")
+            print(f"Token Scopes:        {claims.get('scopes')}")
+            print("===================================================\n")
+            
         return f"Tasks:\n{html.escape(response.text)}"
     except Exception as e:
         return f"Error fetching tasks: {str(e)}"
