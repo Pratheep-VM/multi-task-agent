@@ -64,7 +64,8 @@ def calculate_math(expression: str) -> str:
 def list_tasks() -> str:
     """Lists all tasks from the Task Management System."""
     try:
-        response = client.get(BASE_URL)
+        response = client.get(BASE_URL, timeout=10)
+        response.raise_for_status()
         return f"Tasks:\n{html.escape(response.text)}"
     except Exception as e:
         return f"Error fetching tasks: {str(e)}"
@@ -73,8 +74,9 @@ def list_tasks() -> str:
 def create_task(title: str) -> str:
     """Creates a new task in the Task Management System."""
     try:
-        response = client.post(BASE_URL, json={"title": title})
-        return f"Task Created:\n{html.escape(response.text)}"
+        response = client.post(BASE_URL, json={"title": title}, timeout=10)
+        response.raise_for_status()
+        return f"Task Created Successfully:\n{html.escape(response.text)}"
     except Exception as e:
         return f"Error creating task: {str(e)}"
 
@@ -83,8 +85,9 @@ def modify_task(task_id: str, title: str) -> str:
     """Modifies an existing task by task_id in the Task Management System."""
     try:
         url = f"{BASE_URL}/{task_id}"
-        response = client.put(url, json={"title": title})
-        return f"Task Modified:\n{html.escape(response.text)}"
+        response = client.put(url, json={"title": title}, timeout=10)
+        response.raise_for_status()
+        return f"Task Modified Successfully:\n{html.escape(response.text)}"
     except Exception as e:
         return f"Error modifying task: {str(e)}"
 
@@ -93,8 +96,9 @@ def remove_task(task_id: str) -> str:
     """Removes a task by task_id from the Task Management System."""
     try:
         url = f"{BASE_URL}/{task_id}"
-        response = client.delete(url)
-        return f"Task #{task_id} Removed:\n{html.escape(response.text)}"
+        response = client.delete(url, timeout=10)
+        response.raise_for_status()
+        return f"Task #{task_id} Removed Successfully:\n{html.escape(response.text)}"
     except Exception as e:
         return f"Error removing task: {str(e)}"
 
