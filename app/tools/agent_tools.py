@@ -8,7 +8,7 @@ from app.services.rag_services import get_vector_store
 
 client = Agent()  # reads MUDRAID_API_KEY_ID and MUDRAID_SECRET from .env automatically
 
-BASE_URL = "http://13.235.48.164:8011/api/v1/tasks"
+BASE_URL = "https://pradeepplatform.mudraidtesting.online/api/v1/tasks"
 
 # -------------------------------------------------------------------
 # RAG TOOL
