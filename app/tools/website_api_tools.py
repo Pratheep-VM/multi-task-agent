@@ -5,6 +5,8 @@ import os
 
 from mudraid import Agent
 from langchain_core.tools import tool
+from dotenv import load_dotenv
+load_dotenv()
 
 website_client = Agent(
     api_key_id=os.getenv("WEBSITE_API_KEY_ID"),

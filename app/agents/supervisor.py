@@ -1,5 +1,7 @@
 import os
 from typing import Annotated, Sequence
+from dotenv import load_dotenv
+load_dotenv()
 
 from mudraid import Agent
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage

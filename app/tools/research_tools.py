@@ -4,6 +4,8 @@ import html
 from mudraid import Agent
 from langchain_core.tools import tool
 from app.services.rag_services import get_vector_store
+from dotenv import load_dotenv
+load_dotenv()
 
 research_client = Agent(
     api_key_id=os.getenv("RESEARCH_KEY_ID"),
