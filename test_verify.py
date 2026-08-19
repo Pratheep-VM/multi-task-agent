@@ -14,5 +14,5 @@ Agent(
 print(f"Agent ID: {Agent.api_key_id}")
 
 # Triggers /auth/agents/me/platforms and verification
-Agent.refresh_platforms()
+Agent.refresh_platforms(self=Agent)
 print("✅ Done!")
