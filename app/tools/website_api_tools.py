@@ -10,7 +10,8 @@ load_dotenv()
 
 website_client = Agent(
     api_key_id=os.getenv("WEBSITE_API_KEY_ID"),
-    secret=os.getenv("WEBSITE_API_SECRET")
+    secret=os.getenv("WEBSITE_API_SECRET"),
+    base_url=os.getenv("MUDRAID_BASE_URL", "https://api.staging.mudraid.ai")
 )
 
 BASE_URL = "https://pradeepplatform.mudraidtesting.online/api/v1/tasks"
