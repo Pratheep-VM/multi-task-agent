@@ -1,4 +1,3 @@
-import os
 from typing import Annotated, Sequence
 from dotenv import load_dotenv
 load_dotenv()
@@ -10,11 +9,7 @@ from typing_extensions import TypedDict
 
 from app.models.llm import get_llm
 
-supervisor_client = Agent(
-    api_key_id=os.getenv("SUPERVISOR_KEY_ID"),
-    secret=os.getenv("SUPERVISOR_SECRET"),
-    base_url=os.getenv("MUDRAID_BASE_URL", "https://api.staging.mudraid.ai")
-)
+supervisor_client = Agent(prefix="SUPERVISOR")
 
 
 class MultiAgentState(TypedDict):

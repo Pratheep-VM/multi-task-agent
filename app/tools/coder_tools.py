@@ -1,17 +1,12 @@
 import ast
 import operator
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
 from mudraid import Agent
 from langchain_core.tools import tool
 
-coder_client = Agent(
-    api_key_id=os.getenv("CODER_KEY_ID"),
-    secret=os.getenv("CODER_SECRET"),
-    base_url=os.getenv("MUDRAID_BASE_URL", "https://api.staging.mudraid.ai")
-)
+coder_client = Agent(prefix="CODER")
 
 _SAFE_OPERATORS = {
     ast.Add: operator.add,

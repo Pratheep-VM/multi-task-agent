@@ -1,6 +1,5 @@
 import logging
 from mudraid import Agent
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -8,9 +7,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Automatically reads MUDRAID_API_KEY_ID & MUDRAID_SECRET from your .env
 agent=Agent(
-    api_key_id=os.getenv("SUPERVISOR_KEY_ID"),
-    secret=os.getenv("SUPERVISOR_SECRET"),
-    base_url=os.getenv("MUDRAID_BASE_URL", "https://api.staging.mudraid.ai")
+    prefix="SUPERVISOR"
 )
 print(f"Agent ID: {agent.api_key_id}")
 
