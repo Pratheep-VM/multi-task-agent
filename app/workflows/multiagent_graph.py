@@ -1,7 +1,3 @@
-import os
-import sqlite3
-
-from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 
 from app.agents.supervisor import MultiAgentState, supervisor_node
@@ -41,13 +37,4 @@ builder.add_edge("ResearchAgent", "Supervisor")
 builder.add_edge("CoderAgent", "Supervisor")
 builder.add_edge("WebsiteApiAgent", "Supervisor")
 
-os.makedirs("data", exist_ok=True)
-conn = sqlite3.connect(
-    os.path.join("data", "memory.db"),
-    timeout=30.0,
-    check_same_thread=False,
-)
-conn.execute("PRAGMA journal_mode=WAL;")
-checkpointer = SqliteSaver(conn)
-
-multi_agent_system = builder.compile(checkpointer=checkpointer)
+multi_agent_system = builder.compile()

@@ -1,12 +1,9 @@
-import os
-import sqlite3
 from typing import Annotated, Sequence
 from typing_extensions import TypedDict
 
 from langchain_core.messages import BaseMessage, SystemMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.prebuilt import ToolNode, tools_condition  # <--- Tool Handlers
 
 from app.models.llm import get_llm
@@ -51,11 +48,5 @@ builder.add_conditional_edges("agent", tools_condition)
 # Edge: Tool Output ──► Loop back to Agent
 builder.add_edge("tools", "agent")
 
-# 5. Persistent Memory Database
-os.makedirs("data", exist_ok=True)
-db_path = os.path.join("data", "memory.db")
-conn = sqlite3.connect(db_path, check_same_thread=False)
-checkpointer = SqliteSaver(conn)
-
-# 6. Compile Graph
-basic_agent = builder.compile(checkpointer=checkpointer)
+# 5. Compile Graph
+basic_agent = builder.compile()
