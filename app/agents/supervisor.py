@@ -2,7 +2,7 @@ from typing import Annotated, Sequence
 from dotenv import load_dotenv
 load_dotenv()
 
-from mudraid import build_agent as Agent
+from mudraid import Agent
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
