@@ -2,7 +2,7 @@ import base64
 import html
 import json
 from mudraid import MachineAgent, MachineIdentity, PyJWTSigner
-from linked_machine_client import build_agent
+from app.tools.linked_machine_client import build_agent 
 from langchain_core.tools import tool
 from dotenv import load_dotenv
 load_dotenv()
