@@ -9,7 +9,7 @@ from typing_extensions import TypedDict
 
 from app.models.llm import get_llm
 
-supervisor_client = Agent(prefix="SUPERVISOR")
+supervisor_client = Agent("SUPERVISOR")
 
 
 class MultiAgentState(TypedDict):
