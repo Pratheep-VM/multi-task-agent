@@ -2,14 +2,14 @@ from typing import Annotated, Sequence
 from dotenv import load_dotenv
 load_dotenv()
 
-from mudraid import Agent
+from mudraid import build_agent as Agent
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
 
 from app.models.llm import get_llm
 
-supervisor_client = Agent(prefix="SUPERVISOR")
+supervisor_client = Agent("SUPERVISOR")
 
 
 class MultiAgentState(TypedDict):

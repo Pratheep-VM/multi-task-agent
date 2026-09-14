@@ -2,12 +2,12 @@ import base64
 import html
 import json
 
-from mudraid import Agent
+from mudraid import build_agent as Agent
 from langchain_core.tools import tool
 from dotenv import load_dotenv
 load_dotenv()
 
-website_client = Agent(prefix="WEBSITE_API")
+website_client = Agent("WEBSITE_API")
 
 BASE_URL = "https://pradeepplatform.mudraidtesting.online/api/v1/tasks"
 
