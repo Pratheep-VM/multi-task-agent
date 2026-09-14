@@ -6,7 +6,7 @@ from app.services.rag_services import get_vector_store
 from dotenv import load_dotenv
 load_dotenv()
 
-research_client = Agent(prefix="RESEARCH")
+research_client = Agent.legacy("RESEARCH")
 
 
 @tool

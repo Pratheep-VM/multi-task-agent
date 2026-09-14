@@ -6,7 +6,7 @@ load_dotenv()
 from mudraid import Agent
 from langchain_core.tools import tool
 
-coder_client = Agent(prefix="CODER")
+coder_client = Agent.legacy("CODER")
 
 _SAFE_OPERATORS = {
     ast.Add: operator.add,
