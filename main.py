@@ -5,6 +5,9 @@ from langchain_core.messages import HumanMessage
 from app.agents.multiagent import multi_agent_system
 import uvicorn
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Multi-Task Agent Platform",
@@ -47,8 +50,10 @@ def chat_with_agents(request: AgentQueryRequest):
             agent_response=last_message,
             thread_id=request.thread_id
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception:
+        # Log full details server-side; don't leak internals to the client
+        logger.exception("Agent invocation failed")
+        raise HTTPException(status_code=500, detail="Internal error while processing the request.")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8011, reload=True)

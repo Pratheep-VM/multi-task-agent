@@ -205,13 +205,13 @@
                 </div>
             `;
 
-            const messageContent = `
-                <div class="${isUser ? 'bg-brand-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'} rounded-2xl p-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap">
-                    ${text}
-                </div>
-            `;
+            // Message text is set via textContent so HTML in agent/user output is shown, never executed
+            const messageContent = document.createElement('div');
+            messageContent.className = `${isUser ? 'bg-brand-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-200'} rounded-2xl p-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap`;
+            messageContent.textContent = text;
 
-            msgDiv.innerHTML = avatar + messageContent;
+            msgDiv.innerHTML = avatar;
+            msgDiv.appendChild(messageContent);
             chatMessages.appendChild(msgDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
